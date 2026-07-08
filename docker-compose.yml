@@ -1,0 +1,16 @@
+services:
+  portfolio:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: file:/data/portfolio.db
+      MEDIA_DIR: /data/media
+    env_file:
+      - .env
+    volumes:
+      - portfolio-data:/data
+
+volumes:
+  portfolio-data:
