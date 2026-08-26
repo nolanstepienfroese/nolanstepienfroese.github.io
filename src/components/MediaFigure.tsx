@@ -1,10 +1,12 @@
 import React from 'react'
 
 import type { Media } from '@/payload-types'
-import { isVideo, mediaUrl } from '@/lib/media'
+import { isVideo, mediaUrl, withBasePath } from '@/lib/media'
 
 export function MediaFigure({ media }: { media: Media }) {
-  const src = isVideo(media) ? (media.url ?? null) : mediaUrl(media, 'full')
+  // Videos have no generated sizes, so the raw upload URL is used — but it
+  // still needs the base path when the site is served from a subdirectory.
+  const src = isVideo(media) ? withBasePath(media.url) : mediaUrl(media, 'full')
   if (!src) return null
 
   return (

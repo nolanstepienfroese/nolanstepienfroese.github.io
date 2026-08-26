@@ -29,6 +29,27 @@ const DB_FILE = path.resolve('content.db')
 
 const step = (msg) => console.log(`\n  → ${msg}`)
 
+/**
+ * Works out the URL prefix the site will be served under.
+ *
+ * GitHub serves `<user>/<user>.github.io` from the root, and every other repo
+ * from `/<repo>/`. Actions provides GITHUB_REPOSITORY as "owner/repo", so this
+ * stays correct even if the repo is renamed. Set BASE_PATH explicitly to
+ * override — e.g. BASE_PATH=/my-repo to preview a subdirectory build locally.
+ */
+function resolveBasePath() {
+  if (process.env.BASE_PATH !== undefined) return process.env.BASE_PATH
+  const repository = process.env.GITHUB_REPOSITORY
+  if (!repository || !repository.includes('/')) return ''
+  const [owner, repo] = repository.split('/')
+  // A user/organisation site is served from the root; anything else is nested.
+  return repo.toLowerCase() === `${owner.toLowerCase()}.github.io` ? '' : `/${repo}`
+}
+
+const rawBasePath = resolveBasePath()
+const basePath =
+  rawBasePath === '' || rawBasePath === '/' ? '' : `/${rawBasePath.replace(/^\/+|\/+$/g, '')}`
+
 // If a previous run was killed mid-build, put the admin panel back first.
 if (existsSync(ADMIN_PARKED)) {
   if (existsSync(ADMIN_SRC)) rmSync(ADMIN_PARKED, { recursive: true, force: true })
@@ -51,13 +72,14 @@ try {
     parked = true
   }
 
-  step('running next build (static export)')
+  step(`running next build (static export, base path "${basePath || '/'}")`)
   rmSync(OUT_DIR, { recursive: true, force: true })
   execFileSync('npx', ['next', 'build'], {
     stdio: 'inherit',
     env: {
       ...process.env,
       STATIC_EXPORT: 'true',
+      BASE_PATH: basePath,
       DATABASE_URL: `file:${DB_FILE}`,
       // Only used to satisfy config validation; nothing is signed in a static build.
       PAYLOAD_SECRET: process.env.PAYLOAD_SECRET || 'static-build-placeholder',
@@ -102,5 +124,6 @@ const walk = (dir, base = '') => {
 walk(OUT_DIR)
 
 console.log(`\n  static site ready in out/`)
+console.log(`  base path: ${basePath || '/ (root)'}`)
 console.log(`  ${pages.length} page(s): ${pages.sort().join(', ')}`)
 console.log(`  ${mediaCount} media file(s) copied\n`)

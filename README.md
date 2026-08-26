@@ -92,9 +92,22 @@ Payload's upload URLs keep resolving, and writes `.nojekyll` so Pages serves the
 
 ### One-time repo setup
 
-The repo must be **public** (Pages needs a paid plan for private repos), and under
-**Settings → Pages**, *Source* must be set to **GitHub Actions** — not "Deploy from a
-branch".
+Live at **https://nolanstepienfroese.github.io/** from the repo
+`nolanstepienfroese/nolanstepienfroese.github.io`.
+
+- The repo must be **public** — Pages needs a paid plan for private repos.
+- Under **Settings → Pages**, *Source* must be **GitHub Actions**, not "Deploy from a
+  branch". The deploy fails without this.
+
+A repo named `<user>.github.io` is served from the root, so no URL prefix is needed.
+Any other name is served from `/<repo>/` instead, and every asset path has to be
+prefixed or the site loads as unstyled text. `scripts/build-static.mjs` works this out
+from `GITHUB_REPOSITORY` automatically, so renaming the repo will not break the site.
+To preview a subdirectory build locally:
+
+```bash
+BASE_PATH=/some-repo npm run build:static
+```
 
 ## Deploying with a server instead (Docker)
 

@@ -8,7 +8,8 @@ import './styles.css'
 export const metadata = {
   title: 'Portfolio',
   description: 'Mechanical engineering, mechatronics, and structural projects.',
-  icons: { icon: '/favicon.svg' },
+  // Next does not apply basePath to metadata icon URLs, so prefix it manually.
+  icons: { icon: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/favicon.svg` },
 }
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
