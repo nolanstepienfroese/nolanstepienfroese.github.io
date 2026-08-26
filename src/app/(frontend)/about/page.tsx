@@ -5,8 +5,6 @@ import React from 'react'
 import config from '@/payload.config'
 import { asMedia, mediaUrl } from '@/lib/media'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata = {
   title: 'About',
 }

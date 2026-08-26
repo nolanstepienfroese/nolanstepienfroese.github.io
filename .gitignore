@@ -40,7 +40,17 @@ next-env.d.ts
 
 .env
 
-/media
+# Uploads are NOT ignored: the GitHub Actions build copies media/ into the
+# published site, so these files have to be in the repo. Keep an eye on the
+# size of anything you upload — video especially.
+
+# Admin panel is parked here mid static build; never commit it
+/.payload-admin-parked
+
+# Claude Code machine-local settings and temp files
+.claude/settings.local.json
+.claude/*.tmp.*
+.claude/settings.local.json.tmp.*
 
 # Playwright
 node_modules/
@@ -50,6 +60,14 @@ node_modules/
 /playwright/.cache/
 
 # sqlite database
+# portfolio.db is the working database and stays local — it holds the Payload
+# users row (admin email, password hash, salt).
 *.db
 *.db-shm
 *.db-wal
+*.db.staging
+
+# content.db is the scrubbed, publishable copy produced by
+# `npm run publish:content`. It has no user rows and is what Actions builds
+# the site from, so it is deliberately committed.
+!content.db

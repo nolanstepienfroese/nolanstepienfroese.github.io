@@ -8,7 +8,9 @@ import config from '@/payload.config'
 import { MediaFigure } from '@/components/MediaFigure'
 import { asMedia } from '@/lib/media'
 
-export const dynamic = 'force-dynamic'
+// Any slug not listed by generateStaticParams has no HTML file to serve, so
+// fail the build rather than silently dropping a project from the site.
+export const dynamicParams = false
 
 const TYPE_LABELS: Record<string, string> = {
   mechatronics: 'Mechatronics',
@@ -32,6 +34,24 @@ async function getProject(slug: string) {
     limit: 1,
   })
   return result.docs[0] ?? null
+}
+
+// Enumerates the pages to pre-render at build time — one HTML file per
+// published project. Drafts are excluded, so they never reach the public site.
+export async function generateStaticParams() {
+  const payload = await getPayload({ config: await config })
+  const result = await payload.find({
+    collection: 'projects',
+    where: { _status: { equals: 'published' } },
+    limit: 1000,
+    pagination: false,
+    select: { slug: true },
+  })
+
+  return result.docs
+    .map((doc) => doc.slug)
+    .filter((slug): slug is string => typeof slug === 'string' && slug.length > 0)
+    .map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: Props) {

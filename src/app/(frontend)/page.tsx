@@ -5,8 +5,6 @@ import React from 'react'
 import config from '@/payload.config'
 import { ProjectCard } from '@/components/ProjectCard'
 
-export const dynamic = 'force-dynamic'
-
 export default async function HomePage() {
   const payload = await getPayload({ config: await config })
 

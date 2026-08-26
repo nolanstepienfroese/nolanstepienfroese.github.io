@@ -5,8 +5,6 @@ import React from 'react'
 import config from '@/payload.config'
 import './styles.css'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata = {
   title: 'Portfolio',
   description: 'Mechanical engineering, mechatronics, and structural projects.',

@@ -1,0 +1,72 @@
+# Builds the portfolio into static HTML and publishes it to GitHub Pages.
+#
+# GitHub Pages only serves files — it cannot run the Payload admin panel or the
+# REST API, both of which need a live server. So this workflow runs the same
+# `npm run build:static` you run locally: it reads the committed content.db,
+# pre-renders every page to HTML, and publishes the result.
+#
+# To add content: edit at localhost:3000/admin, run `npm run publish:content`,
+# then commit and push. This workflow does the rest.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Lets you re-deploy from the Actions tab without pushing a commit.
+  workflow_dispatch:
+
+# Permissions the deploy step needs. Nothing here can write to your code.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# If you push twice quickly, let the newer build win rather than racing.
+# `cancel-in-progress: false` so a half-finished deploy is never left published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the static site
+        run: npm run build:static
+
+      # Fails the build rather than publishing a site with missing pages.
+      - name: Sanity-check the output
+        run: |
+          test -f out/index.html          || { echo "::error::out/index.html missing"; exit 1; }
+          test -f out/projects/index.html || { echo "::error::out/projects/index.html missing"; exit 1; }
+          test -f out/about/index.html    || { echo "::error::out/about/index.html missing"; exit 1; }
+          test -f out/.nojekyll           || { echo "::error::out/.nojekyll missing"; exit 1; }
+          echo "Published pages:"; find out -name '*.html' | sort
+
+      - name: Upload the site as a Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
