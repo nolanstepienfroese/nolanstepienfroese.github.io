@@ -71,3 +71,10 @@ node_modules/
 # `npm run publish:content`. It has no user rows and is what Actions builds
 # the site from, so it is deliberately committed.
 !content.db
+
+# Local scratch notes, not for the repo
+/HOW-TO-UPDATE.txt
+
+# Staging folder for photos before they are uploaded through /admin.
+# The site reads media/, not this -- keep these originals out of the repo.
+/Images/
