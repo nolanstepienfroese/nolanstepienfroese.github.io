@@ -525,6 +525,10 @@ export interface SiteSetting {
    * A short paragraph under the tagline on the home page.
    */
   heroIntro?: string | null;
+  /**
+   * Optional headshot shown to the right of the intro on the home page. Displayed 212px wide, so upload at least 425px wide for a sharp result on high-DPI screens.
+   */
+  heroPortrait?: (number | null) | Media;
   email?: string | null;
   socials?:
     | {
@@ -586,6 +590,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   siteName?: T;
   tagline?: T;
   heroIntro?: T;
+  heroPortrait?: T;
   email?: T;
   socials?:
     | T

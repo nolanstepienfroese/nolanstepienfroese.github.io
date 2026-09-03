@@ -178,6 +178,29 @@ h3 {
   border-color: var(--accent);
 }
 
+.hero-layout {
+  display: flex;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+/* min-width lets the copy shrink past its content width; without it a long
+   tagline would push the portrait out of the container instead of wrapping. */
+.hero-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 212px of image inside a 1px hairline each side — `* { box-sizing:
+   border-box }` means the border is part of the declared width. 212 is half
+   the 425px source, so the portrait renders at 2x on high-DPI screens. */
+.hero-portrait {
+  flex: 0 0 214px;
+  width: 214px;
+  border: 1px solid var(--hairline);
+  background: var(--paper-raised);
+}
+
 /* ---------- sections ---------- */
 
 .section {
@@ -573,6 +596,19 @@ h3 {
 @media (max-width: 720px) {
   .hero {
     padding: 4rem 0 3.5rem;
+  }
+
+  .hero-layout {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2rem;
+  }
+
+  /* Above the name once stacked. flex-basis has to go back to auto, since in
+     a column it would otherwise set the height instead of the width. */
+  .hero-portrait {
+    order: -1;
+    flex: 0 0 auto;
   }
 
   .about-layout {

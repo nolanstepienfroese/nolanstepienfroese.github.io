@@ -32,6 +32,15 @@ export const SiteSettings: GlobalConfig = {
       },
     },
     {
+      name: 'heroPortrait',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description:
+          'Optional headshot shown to the right of the intro on the home page. Displayed 212px wide, so upload at least 425px wide for a sharp result on high-DPI screens.',
+      },
+    },
+    {
       name: 'email',
       type: 'email',
     },

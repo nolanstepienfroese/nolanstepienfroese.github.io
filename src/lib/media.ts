@@ -43,3 +43,37 @@ export function isVideo(value: Media | number | null | undefined): boolean {
   const media = asMedia(value)
   return Boolean(media?.mimeType?.startsWith('video/'))
 }
+
+export type ResolvedImage = {
+  src: string
+  width: number | null
+  height: number | null
+  alt: string
+}
+
+/**
+ * Resolves an upload to the src and intrinsic dimensions of a single size.
+ *
+ * Payload skips a configured size when the source is narrower than it, so a
+ * request for `card` on a 641px-wide upload returns nothing; the original is
+ * used instead. Returning the URL and the dimensions together keeps them
+ * describing the same file, which is what lets the browser reserve the right
+ * space before the image loads.
+ */
+export function mediaImage(
+  value: Media | number | null | undefined,
+  size?: SizeName,
+): ResolvedImage | null {
+  const media = asMedia(value)
+  if (!media) return null
+  const sized = size ? media.sizes?.[size] : undefined
+  const source = sized?.url ? sized : media
+  const src = withBasePath(source.url)
+  if (!src) return null
+  return {
+    src,
+    width: source.width ?? null,
+    height: source.height ?? null,
+    alt: media.alt,
+  }
+}
