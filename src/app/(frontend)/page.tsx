@@ -4,12 +4,19 @@ import React from 'react'
 
 import config from '@/payload.config'
 import { ProjectCard } from '@/components/ProjectCard'
+import { ReferencesCarousel } from '@/components/ReferencesCarousel'
+import { ResumeSection } from '@/components/ResumeSection'
 import { mediaImage } from '@/lib/media'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: await config })
 
   const settings = await payload.findGlobal({ slug: 'site-settings' })
+  const resume = await payload.findGlobal({ slug: 'resume' })
+  const references = await payload.findGlobal({ slug: 'reference-letters' })
+
+  // Entered quotes stay off the site until the admin toggle is switched on
+  const quotes = references.showOnSite ? (references.items ?? []) : []
 
   // Rendered 212px wide. Prefers the 640px variant; a portrait narrower than
   // that has none generated, and mediaImage falls back to the original file.
@@ -65,6 +72,8 @@ export default async function HomePage() {
               </div>
             )}
           </div>
+
+          {quotes.length > 0 && <ReferencesCarousel items={quotes} />}
         </div>
       </section>
 
@@ -87,6 +96,8 @@ export default async function HomePage() {
           )}
         </div>
       </section>
+
+      <ResumeSection resume={resume} />
     </>
   )
 }

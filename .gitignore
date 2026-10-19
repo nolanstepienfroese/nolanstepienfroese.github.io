@@ -75,6 +75,10 @@ node_modules/
 # Local scratch notes, not for the repo
 /HOW-TO-UPDATE.txt
 
+# Résumé PDFs kept alongside for reference. Never committed: the repo is
+# public and the résumé includes a phone number.
+/*.pdf
+
 # Staging folder for photos before they are uploaded through /admin.
 # The site reads media/, not this -- keep these originals out of the repo.
 /Images/

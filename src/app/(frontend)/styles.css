@@ -229,6 +229,218 @@ h3 {
   text-decoration: underline;
 }
 
+/* ---------- résumé (home page) ---------- */
+
+/* auto-fit collapses to one column on narrow screens, and lets a lone column
+   take the full width if the other side has no entries. */
+.resume-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 3rem 4rem;
+}
+
+.resume-group + .resume-group {
+  margin-top: 3rem;
+}
+
+/* Entries hang off a hairline with a square marker, like a leader line on a
+   drawing, rather than the usual round timeline dots. */
+.timeline {
+  list-style: none;
+  border-left: 1px solid var(--hairline);
+}
+
+.timeline-entry {
+  position: relative;
+  padding: 0 0 2.25rem 1.5rem;
+}
+
+.timeline-entry:last-child {
+  padding-bottom: 0;
+}
+
+/* 0.5rem square centred on the 1px line, level with the date label. */
+.timeline-entry::before {
+  content: '';
+  position: absolute;
+  left: calc(-0.25rem - 0.5px);
+  top: 0.35rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--paper);
+  border: 1px solid var(--accent);
+}
+
+.timeline-entry h3 {
+  font-size: 1.1rem;
+  margin-top: 0.3rem;
+}
+
+.timeline-org {
+  font-size: 0.92rem;
+  color: var(--ink-muted);
+  margin-top: 0.15rem;
+}
+
+.timeline-entry ul {
+  list-style: square;
+  margin: 0.6rem 0 0 1.1rem;
+  font-size: 0.92rem;
+  color: var(--ink-muted);
+}
+
+.timeline-entry ul li + li {
+  margin-top: 0.3rem;
+}
+
+.timeline-entry ul li::marker {
+  color: var(--hairline);
+}
+
+/* ---------- references (home page) ---------- */
+
+.references {
+  --ref-card-width: min(34rem, calc(100vw - 4rem));
+  --ref-gap: 1.25rem;
+  margin-top: 4rem;
+}
+
+/* Fades the neighbouring cards out towards the container edges. The fade
+   stops exactly at the active card's edges so it never touches the card
+   itself, even on a phone where the card is nearly full width. */
+.references-viewport {
+  --ref-fade: linear-gradient(
+    90deg,
+    transparent,
+    #000 calc(50% - var(--ref-card-width) / 2),
+    #000 calc(50% + var(--ref-card-width) / 2),
+    transparent
+  );
+  overflow: hidden;
+  -webkit-mask-image: var(--ref-fade);
+  mask-image: var(--ref-fade);
+}
+
+/* Every card shares one centred grid cell, so the row is as tall as the
+   longest quote, and each is shifted sideways by its --offset from the active
+   card. Nothing is measured in script, so the prerendered HTML is already
+   laid out correctly before hydration. */
+.references-track {
+  display: grid;
+  grid-template-columns: var(--ref-card-width);
+  justify-content: center;
+}
+
+.references-slide {
+  grid-area: 1 / 1;
+  display: flex;
+  transform: translateX(calc(var(--offset, 0) * (var(--ref-card-width) + var(--ref-gap))));
+  transition: transform 450ms ease, opacity 300ms ease;
+}
+
+/* Wrapping from one side to the other: fade only, never slide across. */
+.references-slide[data-jump] {
+  transition: opacity 300ms ease;
+}
+
+.references-slide[data-position='active'] {
+  z-index: 1;
+}
+
+.references-slide[data-position='near'] {
+  opacity: 0.4;
+}
+
+/* Cards beyond the immediate neighbours wait off to the side, unseen. */
+.references-slide[data-position='far'] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.reference-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--paper-raised);
+  border: 1px solid var(--hairline);
+  border-left: 2px solid var(--accent);
+  padding: 1.25rem 1.5rem;
+}
+
+.reference-card blockquote p {
+  font-style: italic;
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.reference-card figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--hairline-soft);
+  font-size: 0.82rem;
+}
+
+.reference-name {
+  font-weight: 600;
+  color: var(--accent-ink);
+}
+
+.reference-role {
+  color: var(--ink-muted);
+}
+
+.references-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.references-arrow {
+  width: 2rem;
+  height: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  background: var(--paper-raised);
+  border: 1px solid var(--hairline);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+.references-arrow:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+/* The visible bar is drawn by ::before; the button's padding keeps the click
+   target larger than the 2px line. */
+.references-dot {
+  padding: 0.6rem 0.15rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.references-dot::before {
+  content: '';
+  display: block;
+  width: 1.25rem;
+  height: 2px;
+  background: var(--hairline);
+  transition: background 120ms ease;
+}
+
+.references-dot[aria-current='true']::before {
+  background: var(--accent);
+}
+
 /* ---------- project grid & cards ---------- */
 
 .project-grid {
@@ -627,5 +839,11 @@ h3 {
 
   .site-nav {
     gap: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .references-slide {
+    transition: none;
   }
 }

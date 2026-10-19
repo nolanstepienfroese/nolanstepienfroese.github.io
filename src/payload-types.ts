@@ -92,10 +92,14 @@ export interface Config {
   globals: {
     'site-settings': SiteSetting;
     about: About;
+    resume: Resume;
+    'reference-letters': ReferenceLetter;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     about: AboutSelect<false> | AboutSelect<true>;
+    resume: ResumeSelect<false> | ResumeSelect<true>;
+    'reference-letters': ReferenceLettersSelect<false> | ReferenceLettersSelect<true>;
   };
   locale: null;
   widgets: {
@@ -583,6 +587,134 @@ export interface About {
   createdAt?: string | null;
 }
 /**
+ * Experience, education and awards shown on the home page, below the featured projects. Drag rows to reorder.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resume".
+ */
+export interface Resume {
+  id: number;
+  experience?:
+    | {
+        /**
+         * Role, e.g. "Engineering Student".
+         */
+        title: string;
+        /**
+         * Company, e.g. "Quantum Engineering Ltd.".
+         */
+        organization: string;
+        /**
+         * Optional, e.g. "Chilliwack, BC".
+         */
+        location?: string | null;
+        /**
+         * Shown exactly as typed, e.g. "May 2026 – Aug 2026", "Expected May 2029" or "2024".
+         */
+        dates: string;
+        highlights?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  education?:
+    | {
+        /**
+         * Program, e.g. "Bachelor of Applied Science – Mechanical Engineering".
+         */
+        title: string;
+        /**
+         * School, e.g. "University of British Columbia".
+         */
+        organization: string;
+        /**
+         * Optional, e.g. "Chilliwack, BC".
+         */
+        location?: string | null;
+        /**
+         * Shown exactly as typed, e.g. "May 2026 – Aug 2026", "Expected May 2029" or "2024".
+         */
+        dates: string;
+        highlights?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  awards?:
+    | {
+        /**
+         * Award, e.g. "4th Place, National Competition".
+         */
+        title: string;
+        /**
+         * Awarded by, e.g. "Skills Canada".
+         */
+        organization: string;
+        /**
+         * Optional, e.g. "Chilliwack, BC".
+         */
+        location?: string | null;
+        /**
+         * Shown exactly as typed, e.g. "May 2026 – Aug 2026", "Expected May 2029" or "2024".
+         */
+        dates: string;
+        highlights?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Quotes from reference letters, shown as a row of cards under the home page intro. Hidden until "Show on home page" is checked.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reference-letters".
+ */
+export interface ReferenceLetter {
+  id: number;
+  /**
+   * Leave unchecked while the quotes are being collected. Nothing appears on the site until this is on.
+   */
+  showOnSite?: boolean | null;
+  items?:
+    | {
+        /**
+         * The excerpt to show. Quotation marks are added automatically.
+         */
+        quote: string;
+        /**
+         * Who wrote the letter.
+         */
+        name: string;
+        /**
+         * Their title, e.g. "Project Engineer".
+         */
+        role?: string | null;
+        /**
+         * Where they work, e.g. "Quantum Engineering Ltd.".
+         */
+        organization?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings_select".
  */
@@ -616,6 +748,79 @@ export interface AboutSelect<T extends boolean = true> {
     | {
         group?: T;
         skills?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resume_select".
+ */
+export interface ResumeSelect<T extends boolean = true> {
+  experience?:
+    | T
+    | {
+        title?: T;
+        organization?: T;
+        location?: T;
+        dates?: T;
+        highlights?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  education?:
+    | T
+    | {
+        title?: T;
+        organization?: T;
+        location?: T;
+        dates?: T;
+        highlights?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  awards?:
+    | T
+    | {
+        title?: T;
+        organization?: T;
+        location?: T;
+        dates?: T;
+        highlights?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reference-letters_select".
+ */
+export interface ReferenceLettersSelect<T extends boolean = true> {
+  showOnSite?: T;
+  items?:
+    | T
+    | {
+        quote?: T;
+        name?: T;
+        role?: T;
+        organization?: T;
         id?: T;
       };
   updatedAt?: T;

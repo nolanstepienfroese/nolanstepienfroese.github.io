@@ -31,7 +31,7 @@ const PURGE = [
 ]
 
 // Must survive the purge, or the built site would be empty.
-const CONTENT = ['projects', 'media', 'site_settings', 'about']
+const CONTENT = ['projects', 'media', 'site_settings', 'about', 'resume', 'reference_letters']
 
 const fail = (msg) => {
   console.error(`\n  publish:content FAILED — ${msg}\n`)
@@ -48,6 +48,22 @@ for (const leftover of [STAGING, `${STAGING}-wal`, `${STAGING}-shm`]) {
 // VACUUM INTO (not copyFile) so any pending WAL content is folded in and the
 // staging file starts clean.
 const source = new DatabaseSync(SOURCE)
+
+// Payload only creates tables for new collections and globals when the dev
+// server starts. Publishing before that would ship a content.db the build
+// cannot query.
+const sourceTables = source
+  .prepare("select name from sqlite_master where type='table'")
+  .all()
+  .map((r) => r.name)
+const missing = CONTENT.filter((t) => !sourceTables.includes(t))
+if (missing.length > 0) {
+  source.close()
+  fail(
+    `${path.basename(SOURCE)} has no ${missing.join(', ')} table(s).\n` +
+      `  Run \`npm run dev\` once so Payload creates them, then publish again.`,
+  )
+}
 
 /** Values that must not appear anywhere in the published file. */
 const secrets = []
