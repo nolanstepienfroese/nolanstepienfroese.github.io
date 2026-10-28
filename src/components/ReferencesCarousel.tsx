@@ -22,19 +22,34 @@ function offsetFrom(active: number, index: number, count: number): number {
 }
 
 /**
+ * Clicking an arrow focuses it too, which shouldn't hold the carousel still
+ * once the mouse has left. Keyboard focus is what the browser marks
+ * :focus-visible; a browser too old to know the selector pauses on any focus.
+ */
+function isKeyboardFocus(element: Element): boolean {
+  try {
+    return element.matches(':focus-visible')
+  } catch {
+    return true
+  }
+}
+
+/**
  * Reference-letter quotes with the active card centred and its neighbours
  * faded out on either side, looping in both directions.
  *
  * Every quote is in the prerendered HTML; the browser only moves the cards.
- * It advances on its own, except while the visitor is hovering over or has
- * focused inside it, or prefers reduced motion.
+ * It advances on its own, except while the visitor is hovering a mouse over
+ * it or has keyboard focus inside it, or prefers reduced motion.
  */
 export function ReferencesCarousel({ items }: { items: Reference[] }) {
   // `previous` lets a card that wraps from one side to the other skip the
   // slide animation instead of visibly crossing the row.
   const [{ active, previous }, setPosition] = useState({ active: 0, previous: 0 })
   // Tracked separately so moving the mouse away doesn't resume rotation while
-  // keyboard focus is still inside, and vice versa.
+  // keyboard focus is still inside, and vice versa. Only a mouse counts as
+  // hovering: a phone treats the spot it last tapped as hovered until the next
+  // tap elsewhere, which would hold it still after tapping an arrow.
   const [hovered, setHovered] = useState(false)
   const [focused, setFocused] = useState(false)
   const paused = hovered || focused
@@ -68,9 +83,15 @@ export function ReferencesCarousel({ items }: { items: Reference[] }) {
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false)
       }}
-      onFocus={() => setFocused(true)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onFocus={(event) => {
+        if (isKeyboardFocus(event.target)) setFocused(true)
+      }}
+      onPointerEnter={(event) => {
+        if (event.pointerType === 'mouse') setHovered(true)
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === 'mouse') setHovered(false)
+      }}
     >
       <div className="references-viewport">
         <div className="references-track">
