@@ -537,7 +537,12 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin: 1.5rem 0 2.5rem;
+  margin-top: 1.5rem;
+}
+
+/* Holds the gap below the filter row, or below the heading when there's no row. */
+.project-results {
+  margin-top: 2.5rem;
 }
 
 .filter-chip {

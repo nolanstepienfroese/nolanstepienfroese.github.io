@@ -1,17 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import type { Project } from '@/payload-types'
 import { ProjectCard } from '@/components/ProjectCard'
 import { PROJECT_TYPES } from '@/collections/Projects'
 
-const isKnownType = (value: string | null): value is string =>
-  PROJECT_TYPES.some((t) => t.value === value)
+const isListedType = (types: readonly { value: string }[], value: string | null): value is string =>
+  types.some((t) => t.value === value)
 
 /**
  * Filter chips for the projects index.
+ *
+ * Only types with a published project get a chip, and the row stays hidden
+ * until there are at least two to choose between. A type reappears on its own
+ * once a project of that type is published.
  *
  * The site is statically exported, so there is no server to read `?type=` from
  * the request — the filtering happens in the browser instead.
@@ -24,18 +28,23 @@ const isKnownType = (value: string | null): value is string =>
  */
 export function ProjectsBrowser({ projects }: { projects: Project[] }) {
   const [activeType, setActiveType] = useState<string | undefined>(undefined)
+  const types = useMemo(
+    () => PROJECT_TYPES.filter((t) => projects.some((p) => p.type === t.value)),
+    [projects],
+  )
 
   // Runs after hydration, so the server and first client render agree.
+  // A link to a type with nothing published falls back to showing everything.
   useEffect(() => {
     const readUrl = () => {
       const type = new URLSearchParams(window.location.search).get('type')
-      setActiveType(isKnownType(type) ? type : undefined)
+      setActiveType(isListedType(types, type) ? type : undefined)
     }
     readUrl()
     // Keep the chips in sync with the browser's back/forward buttons.
     window.addEventListener('popstate', readUrl)
     return () => window.removeEventListener('popstate', readUrl)
-  }, [])
+  }, [types])
 
   const select = useCallback((event: React.MouseEvent<HTMLAnchorElement>, value?: string) => {
     // Let modified clicks (new tab, new window) behave as real navigations —
@@ -54,41 +63,45 @@ export function ProjectsBrowser({ projects }: { projects: Project[] }) {
 
   return (
     <>
-      <div className="filter-row">
-        <Link
-          aria-current={!activeType}
-          className="filter-chip"
-          href="/projects"
-          onClick={(e) => select(e, undefined)}
-        >
-          All
-        </Link>
-        {PROJECT_TYPES.map((t) => (
+      {types.length > 1 && (
+        <div className="filter-row">
           <Link
-            aria-current={activeType === t.value}
+            aria-current={!activeType}
             className="filter-chip"
-            href={`/projects?type=${t.value}`}
-            key={t.value}
-            onClick={(e) => select(e, t.value)}
+            href="/projects"
+            onClick={(e) => select(e, undefined)}
           >
-            {t.label}
+            All
           </Link>
-        ))}
-      </div>
-
-      {visible.length > 0 ? (
-        <div className="project-grid">
-          {visible.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+          {types.map((t) => (
+            <Link
+              aria-current={activeType === t.value}
+              className="filter-chip"
+              href={`/projects?type=${t.value}`}
+              key={t.value}
+              onClick={(e) => select(e, t.value)}
+            >
+              {t.label}
+            </Link>
           ))}
         </div>
-      ) : (
-        <div className="empty-state">
-          {activeType
-            ? 'No published projects of this type yet.'
-            : 'No published projects yet — add one in the admin panel.'}
-        </div>
       )}
+
+      <div className="project-results">
+        {visible.length > 0 ? (
+          <div className="project-grid">
+            {visible.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            {activeType
+              ? 'No published projects of this type yet.'
+              : 'No published projects yet — add one in the admin panel.'}
+          </div>
+        )}
+      </div>
     </>
   )
 }
