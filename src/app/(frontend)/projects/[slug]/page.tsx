@@ -13,6 +13,7 @@ import { asMedia } from '@/lib/media'
 export const dynamicParams = false
 
 const TYPE_LABELS: Record<string, string> = {
+  mechanical: 'Mechanical',
   mechatronics: 'Mechatronics',
   structural: 'Structural',
   software: 'Software',

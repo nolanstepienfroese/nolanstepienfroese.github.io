@@ -145,7 +145,7 @@ export interface Project {
   /**
    * Primary discipline — used for filtering on the projects page.
    */
-  type: 'mechatronics' | 'structural' | 'software' | 'content';
+  type: 'mechanical' | 'mechatronics' | 'structural' | 'software' | 'content';
   /**
    * Freeform tags, e.g. SOLIDWORKS, OpenCV, CSA S16.
    */

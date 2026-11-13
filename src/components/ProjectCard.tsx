@@ -5,6 +5,7 @@ import type { Project } from '@/payload-types'
 import { mediaUrl, asMedia } from '@/lib/media'
 
 const TYPE_LABELS: Record<string, string> = {
+  mechanical: 'Mechanical',
   mechatronics: 'Mechatronics',
   structural: 'Structural',
   software: 'Software',

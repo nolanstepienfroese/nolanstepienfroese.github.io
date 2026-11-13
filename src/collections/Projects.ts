@@ -17,6 +17,7 @@ const formatSlug: FieldHook = ({ value, data }) => {
 }
 
 export const PROJECT_TYPES = [
+  { label: 'Mechanical', value: 'mechanical' },
   { label: 'Mechatronics', value: 'mechatronics' },
   { label: 'Structural', value: 'structural' },
   { label: 'Software', value: 'software' },
